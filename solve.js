@@ -4,10 +4,14 @@
 addEventListener("fetch", (event) => event.respondWith(handle(event.request)))
 
 function handle(request) {
-  let routes = { "/favicon.ico": flag, "/": solve }
-  let { pathname, search } = new URL(request.url)
+  let routes = {
+    "/favicon.ico": flag,
+    "/new": random,
+    "/": solve
+  }
+  let { pathname, search, origin } = new URL(request.url)
   try {
-    return routes[pathname](search)
+    return routes[pathname](search, origin)
   } catch (err) {
     console.log(err)
     return new Response(`<pre>${err}</pre>`, {status:500})
@@ -20,6 +24,21 @@ function flag() {
   let text = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎯</text></svg>`
   return new Response(text, { headers: { "content-type": "image/svg+xml" } })
 }
+
+function random(search, origin) {
+  let puzzles = [
+    `?6....7.1.2.....84....6..95....75...1..1...7..8...32....86..3....25.....4.9.5....1`,
+    `?.3...1....24.3.5.....7.58...7...4.1.....8.7......579....6.5.3.7.4.......3...2..6.`,
+    `?.2.9..1...3.1....8.9.5......6....34.8..3.9..6.47....2......7.8.4....3.1...9..6.5.`,
+    `?....4....634..9...7..2.8.4..9.....18.7..6..4.82.....6..6.7.5..9...3..215....9....`,
+    `?..6...4...5.6.12......3..65.59.8.6......1......8.7.31.59..4......28.7.3...7...4..`
+  ]
+  let chosen = puzzles[Math.floor(puzzles.length*Math.random())]
+  if (chosen == search) return random(search, origin)
+  return Response.redirect(origin + chosen, 302)
+}
+
+
 
 function solve(search) {
 
@@ -140,7 +159,11 @@ function solve(search) {
       <meta name="robots" content="noindex,nofollow">
     </head>
     <body>
-      <h1>Sudoku Solver</h1>
+      <style> table {font-family: "Helvetica Neue", Verdana, helvetica, Arial, Sans;} </style>
+      <center>
+      <h1>Sudoku Solver<br>
+      <button onclick="location.href='/new'+location.search">new puzzle</button>
+      </h1>
       ${board}
       <p>We show choices satisfying two simple rules: <br>
       <i>at-most-one</i> and <i>at-least-one</i> of every digit<br>
