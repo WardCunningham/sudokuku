@@ -10,6 +10,7 @@ function handle(request) {
     "/": solve
   }
   let { pathname, search, origin } = new URL(request.url)
+  console.log(Date.now(), pathname)
   try {
     return routes[pathname](search, origin)
   } catch (err) {
@@ -145,13 +146,27 @@ function solve(search) {
       }).join("");
   }
 
+  function fold(choices) {
+    const tres  = regex => {let m = choices.match(regex); console.log(choices, regex,m); return m ? `${m[1]}<br>${m[2]}<br>${m[3]}` : null}
+    const duo  = regex => {let m = choices.match(regex); return m ? `${m[1]}<br>${m[2]}` : null}
+    return tres(/^(...)(...)(...)$/) ||
+      tres(/^(...)(...)(..)$/) ||
+      tres(/^(..)(...)(..)$/) ||
+      duo(/^(...)(...)$/) ||
+      duo(/^(...)(..)$/) ||
+      duo(/^(..)(..)$/) ||
+      choices
+  }
+
   for (let i=0; i <= 80; i++) {
     const digit = givens[i];
     const content = (digit != '.')
       ? `<font size=8>${digit}`
-      : choicesFn(i);
+      : choicesFn(i)
     board = board.replace('X', content);
   }
+
+
 
   let text = `
     <html>
@@ -161,7 +176,7 @@ function solve(search) {
     <body>
       <style>
         table { font-family: "Helvetica Neue", Verdana, helvetica, Arial, Sans; }
-        td a { text-decoration: none; }
+        td a { text-decoration: none;}
       </style>
       <center>
       <h1>Sudoku Solver<br>
