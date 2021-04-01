@@ -137,7 +137,7 @@ function solve(search) {
     return Array.from(choices[i])
       .map(digit => {
         if (uniqueChoice && digit != uniqueChoice) {
-          return `\n<font color=gray size=-1>${digit}</font>`;
+          return `\n`;
         } else {
           let search = nextGivens(i, digit);
           return `\n<a href="?${search}">${digit}</a>`;
@@ -159,7 +159,10 @@ function solve(search) {
       <meta name="robots" content="noindex,nofollow">
     </head>
     <body>
-      <style> table {font-family: "Helvetica Neue", Verdana, helvetica, Arial, Sans;} </style>
+      <style>
+        table { font-family: "Helvetica Neue", Verdana, helvetica, Arial, Sans; }
+        td a { text-decoration: none; }
+      </style>
       <center>
       <h1>Sudoku Solver<br>
       <button onclick="location.href='/new'+location.search">new puzzle</button>
