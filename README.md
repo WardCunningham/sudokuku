@@ -14,3 +14,11 @@ Each step has a unique url that you can bookmark or send to friends. Use a blank
 This repo is linked to Deno Deploy to publish changes globally on merge to main.
 
 https://deno.com/deploy
+
+# history
+
+I bought a sudoku puzzle book at the airport as I headed out cross-country to Boston.
+I reached for the book expecting more idle entertainment on the return trip but found I had left it in the hotel.
+I did have a laptop with me so I wrote this puzzle solver instead.
+
+http://c2.com/~ward/sudokant.txt
