@@ -31,7 +31,9 @@ function random(search, origin) {
     `?.3...1....24.3.5.....7.58...7...4.1.....8.7......579....6.5.3.7.4.......3...2..6.`,
     `?.2.9..1...3.1....8.9.5......6....34.8..3.9..6.47....2......7.8.4....3.1...9..6.5.`,
     `?....4....634..9...7..2.8.4..9.....18.7..6..4.82.....6..6.7.5..9...3..215....9....`,
-    `?..6...4...5.6.12......3..65.59.8.6......1......8.7.31.59..4......28.7.3...7...4..`
+    `?..6...4...5.6.12......3..65.59.8.6......1......8.7.31.59..4......28.7.3...7...4..`,
+    `?18.4........2..97...........79..1...............8..64...........48..2........7.93`,
+    `?.475..9....1....4...24...15.3........527.418........9.27...13...6....2....1..457.`  // diabolical
   ]
   let chosen = puzzles[Math.floor(puzzles.length*Math.random())]
   if (chosen == search) return random(search, origin)
@@ -132,6 +134,14 @@ function solve(search) {
     return res.join("");
   }
 
+  function nextForced() {
+    let res = givens.map((g,i) =>
+      g!='.' ? g :
+      choices[i].length==1 ? choices[i] :
+      unique[i] ? unique[i] : '.')
+    return res.join("")
+  }
+
   function choicesFn(i) {
     const uniqueChoice = unique[i];
     return Array.from(choices[i])
@@ -168,6 +178,7 @@ function solve(search) {
       <button onclick="location.href='/new'+location.search">new puzzle</button>
       </h1>
       ${board}
+      <p><button onclick="location.href='/?${nextForced()}'">forced moves</button>
       <p>We show choices satisfying two simple rules: <br>
       <i>at-most-one</i> and <i>at-least-one</i> of every digit<br>
       must appear in every row, column and square.</p>
