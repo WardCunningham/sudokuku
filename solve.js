@@ -9,7 +9,9 @@ function handle(request) {
     "/new": random,
     "/": solve
   }
+  let client = request.headers.get("x-forwarded-for")
   let { pathname, search, origin } = new URL(request.url)
+  post([{eventType:'Sudokuku', pathname, search, origin, client}])
   try {
     return routes[pathname](search, origin)
   } catch (err) {
@@ -187,4 +189,18 @@ function solve(search) {
     </html>`
 
   return new Response(text, { headers: { "content-type": "text/html" } })
+}
+
+function post(data) {
+  fetch('https://insights-collector.newrelic.com/v1/accounts/3138524/events', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Insert-Key': Deno.env.get("INSIGHTS_INSERT_KEY")
+    },
+    body: JSON.stringify(data),
+  })
+  .then(res => res.json())
+  .then(success => console.log({success}))
+  .catch(error => console.error(Date().toLocaleString(),error.message))
 }
