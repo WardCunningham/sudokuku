@@ -2,6 +2,7 @@
 // https://deno.com/deploy/docs/hello-world
 
 addEventListener("fetch", (event) => event.respondWith(handle(event.request)))
+const started = Date.now()
 
 function handle(request) {
   let routes = {
@@ -11,7 +12,7 @@ function handle(request) {
   }
   let client = request.headers.get("x-forwarded-for")
   let { pathname, search, origin } = new URL(request.url)
-  post([{eventType:'Sudokuku', pathname, search, origin, client}])
+  post([{eventType:'Sudokuku', pathname, search, origin, client, started}])
   try {
     return routes[pathname](search, origin)
   } catch (err) {
