@@ -17,7 +17,7 @@ https://deno.com/deploy
 
 # history
 
-I bought a sudoku puzzle book at the airport as I headed out cross-country to Boston.
+In 2005 I bought a sudoku puzzle book at the airport as I headed out cross-country to Boston.
 I reached for the book expecting more idle entertainment on the return trip but found I had left it in the hotel.
 I did have a laptop with me so I wrote this puzzle solver instead.
 
