@@ -57,7 +57,7 @@ async function save(search) {
     issue_number: 1,
     body: `https://sudokuku.deno.dev/${search}`
   });
-  console.log(result)
+  console.log('github rate limit remaining', result.headers["x-ratelimit-remaining"])
   return new Response('ok', {status:200})
 }
 
