@@ -46,7 +46,7 @@ function random(search, origin) {
 
 function save(search) {
   console.log('save', search)
-  return Response('ok', 200)
+  return new Response('ok', 200)
 }
 
 
