@@ -45,7 +45,8 @@ function random(search, origin) {
 }
 
 function save(search) {
-  console.log(search)
+  console.log('save', search)
+  return Response('ok', 200)
 }
 
 
@@ -194,7 +195,7 @@ function solve(search) {
       <p>Fork this on <a href="https://github.com/WardCunningham/sudokuku">github</a></p>
       <script type=module>
         window.dosave = async event => {
-          await fetch('./save?'+location.search)
+          await fetch('./save'+location.search)
           event.target.disabled
         }
       </script>
