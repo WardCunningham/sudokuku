@@ -8,6 +8,7 @@ function handle(request) {
   let routes = {
     "/favicon.ico": flag,
     "/new": random,
+    "/save": save,
     "/": solve
   }
   let client = request.headers.get("x-forwarded-for")
@@ -41,6 +42,10 @@ function random(search, origin) {
   let chosen = puzzles[Math.floor(puzzles.length*Math.random())]
   if (chosen == search) return random(search, origin)
   return Response.redirect(origin + chosen, 302)
+}
+
+function save(search) {
+  console.log(search)
 }
 
 
@@ -179,6 +184,7 @@ function solve(search) {
       <center>
       <h1>Sudoku Solver<br>
       <button onclick="location.href='/new'+location.search">new puzzle</button>
+      <button onclick="save(event)">save puzzle</button>
       </h1>
       ${board}
       <p><button onclick="location.href='/?${nextForced()}'">forced moves</button>
@@ -186,6 +192,12 @@ function solve(search) {
       <i>at-most-one</i> and <i>at-least-one</i> of every digit<br>
       must appear in every row, column and square.</p>
       <p>Fork this on <a href="https://github.com/WardCunningham/sudokuku">github</a></p>
+      <script type=modlue>
+        window.save = async event => {
+          await fetch('./save?'+location.search)
+          event.target.disabled
+        }
+      </script>
     </body>
     </html>`
 
