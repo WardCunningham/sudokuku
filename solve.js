@@ -4,8 +4,8 @@
 import { Octokit } from "https://cdn.skypack.dev/octokit?dts";
 import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
 
-// addEventListener("fetch", async event => event.respondWith(handle(event.request)))
-serve((request) => handle(request))
+addEventListener("fetch", event => event.respondWith(handle(event.request)))
+// serve((request) => handle(request))
 console.log('ready on port 8000')
 
 
