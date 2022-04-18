@@ -1,20 +1,27 @@
 
 // https://deno.com/deploy/docs/hello-world
 
-import { Octokit, App } from "https://cdn.skypack.dev/octokit?dts";
+import { Octokit } from "https://cdn.skypack.dev/octokit?dts";
+import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
 
-addEventListener("fetch", async event => event.respondWith(handle(event.request)))
+// addEventListener("fetch", async event => event.respondWith(handle(event.request)))
+serve((request) => handle(request))
+console.log('ready on port 8000')
+
+
 const started = Date.now()
 
 function handle(request) {
-  let routes = {
+  const routes = {
     "/favicon.ico": flag,
     "/new": random,
     "/save": save,
+    "/choices": choices,
     "/": solve
   }
-  let client = request.headers.get("x-forwarded-for")
-  let { pathname, search, origin } = new URL(request.url)
+  console.log(request)
+  const client = request.headers.get("x-forwarded-for")
+  const { pathname, search, origin } = new URL(request.url)
   post([{eventType:'Sudokuku', pathname, search, origin, client, started}])
   try {
     return routes[pathname](search, origin)
@@ -27,12 +34,12 @@ function handle(request) {
 // https://css-tricks.com/emojis-as-favicons/
 
 function flag() {
-  let text = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎯</text></svg>`
+  const text = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎯</text></svg>`
   return new Response(text, { headers: { "content-type": "image/svg+xml" } })
 }
 
 function random(search, origin) {
-  let puzzles = [
+  const puzzles = [
     `?6....7.1.2.....84....6..95....75...1..1...7..8...32....86..3....25.....4.9.5....1`,
     `?.3...1....24.3.5.....7.58...7...4.1.....8.7......579....6.5.3.7.4.......3...2..6.`,
     `?.2.9..1...3.1....8.9.5......6....34.8..3.9..6.47....2......7.8.4....3.1...9..6.5.`,
@@ -41,7 +48,7 @@ function random(search, origin) {
     `?18.4........2..97...........79..1...............8..64...........48..2........7.93`,
     `?.475..9....1....4...24...15.3........527.418........9.27...13...6....2....1..457.`  // diabolical
   ]
-  let chosen = puzzles[Math.floor(puzzles.length*Math.random())]
+  const chosen = puzzles[Math.floor(puzzles.length*Math.random())]
   if (chosen == search) return random(search, origin)
   return Response.redirect(origin + chosen, 302)
 }
@@ -108,11 +115,11 @@ function solve(search) {
 
   // remove choices eliminated by the at-most-one rule
 
-  for (let subset of subsets) {
-    for (let i of subset) {
+  for (const subset of subsets) {
+    for (const i of subset) {
       const d = givens[i];
       if (d == ".") continue;
-      for (let j of subset) {
+      for (const j of subset) {
         choices[j] = choices[j].replace(d, "");
       }
     }
@@ -123,17 +130,17 @@ function solve(search) {
   const unique = {};
   const digitCounts = Array.from("123456789")
     .reduce((acc, d) => {acc[d] = 0; return acc}, {});
-  for (let subset of subsets) {
+  for (const subset of subsets) {
     const counts = {...digitCounts};
     const where = {...digitCounts};
     subset
       .filter(i => givens[i] == ".")
       .forEach(i => {
         const digits = Array.from(choices[i]);
-        for (let d of digits) {
+        for (const d of digits) {
           counts[d] += 1;
           where[d] = i;
-        };
+        }
       });
     Array.from("123456789")
       .filter(d => counts[d] == 1)
@@ -147,16 +154,16 @@ function solve(search) {
     return `\n<table>` + Array.from({length:3}).map(_=>`<tr>${row}${row}${row}`).join('') + `</table>`;
   }
 
-  let board = table(table("X"));
+  const board = table(table("X"));
 
   function nextGivens(i, digit) {
-    let res = Array.from(givens);
+    const res = Array.from(givens);
     res[i] = digit;
     return res.join("");
   }
 
   function nextForced() {
-    let res = givens.map((g,i) =>
+    const res = givens.map((g,i) =>
       g!='.' ? g :
       choices[i].length==1 ? choices[i] :
       unique[i] ? unique[i] : '.')
@@ -170,13 +177,13 @@ function solve(search) {
         if (uniqueChoice && digit != uniqueChoice) {
           return `\n`;
         } else {
-          let search = nextGivens(i, digit);
+          const search = nextGivens(i, digit);
           return `\n<a href="?${search}">${digit}</a>`;
         }
       }).join("");
   }
 
-  for (let i=0; i <= 80; i++) {
+  for (const i=0; i <= 80; i++) {
     const digit = givens[i];
     const content = (digit != '.')
       ? `<font size=8>${digit}`
@@ -184,7 +191,7 @@ function solve(search) {
     board = board.replace('X', content);
   }
 
-  let text = `
+  const text = `
     <html>
     <head>
       <meta name="robots" content="noindex,nofollow">
@@ -201,6 +208,7 @@ function solve(search) {
       </h1>
       ${board}
       <p><button onclick="location.href='/?${nextForced()}'">forced moves</button>
+      <button onclick="choices(event)">download choices</button>
       <p>We show choices satisfying two simple rules: <br>
       <i>at-most-one</i> and <i>at-least-one</i> of every digit<br>
       must appear in every row, column and square.</p>
