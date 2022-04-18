@@ -184,7 +184,7 @@ function solve(search) {
       <center>
       <h1>Sudoku Solver<br>
       <button onclick="location.href='/new'+location.search">new puzzle</button>
-      <button onclick="save(event)">save puzzle</button>
+      <button onclick="dosave(event)">save puzzle</button>
       </h1>
       ${board}
       <p><button onclick="location.href='/?${nextForced()}'">forced moves</button>
@@ -193,7 +193,7 @@ function solve(search) {
       must appear in every row, column and square.</p>
       <p>Fork this on <a href="https://github.com/WardCunningham/sudokuku">github</a></p>
       <script type=modlue>
-        window.save = async event => {
+        window.dosave = async event => {
           await fetch('./save?'+location.search)
           event.target.disabled
         }
