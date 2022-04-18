@@ -1,7 +1,9 @@
 
 // https://deno.com/deploy/docs/hello-world
 
-addEventListener("fetch", (event) => event.respondWith(handle(event.request)))
+import { Octokit, App } from "https://cdn.skypack.dev/octokit?dts";
+
+addEventListener("fetch", async event => event.respondWith(handle(event.request)))
 const started = Date.now()
 
 function handle(request) {
@@ -44,8 +46,18 @@ function random(search, origin) {
   return Response.redirect(origin + chosen, 302)
 }
 
-function save(search) {
+async function save(search) {
   console.log('save', search)
+  const skey = Deno.env.get('SKEY')
+  const octokit = new Octokit({ auth:skey });
+  const {data:{ login }} = await octokit.rest.users.getAuthenticated();
+  const result = await octokit.rest.issues.createComment({
+    owner: login,
+    repo: "postmatic",
+    issue_number: 1,
+    body: `https://sudokuku.deno.dev/${search}`
+  });
+  console.log(result)
   return new Response('ok', {status:200})
 }
 
