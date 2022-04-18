@@ -196,7 +196,7 @@ function solve(search) {
       <script type=module>
         window.dosave = async event => {
           await fetch('./save'+location.search)
-          event.target.disabled
+          event.target.disabled = true
         }
       </script>
     </body>
