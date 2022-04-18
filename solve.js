@@ -192,7 +192,7 @@ function solve(search) {
       <i>at-most-one</i> and <i>at-least-one</i> of every digit<br>
       must appear in every row, column and square.</p>
       <p>Fork this on <a href="https://github.com/WardCunningham/sudokuku">github</a></p>
-      <script type=modlue>
+      <script type=module>
         window.dosave = async event => {
           await fetch('./save?'+location.search)
           event.target.disabled
