@@ -1,16 +1,20 @@
-
-// https://deno.com/deploy/docs/hello-world
+// Sudoku Solver
+// Usage: deno run --allow-net=:8000 --allow-env --watch solve.js
 
 import { Octokit, App } from "https://cdn.skypack.dev/octokit?dts";
+import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
 
-addEventListener("fetch", async event => event.respondWith(handle(event.request)))
+// addEventListener("fetch", event => event.respondWith(handle(event.request)))
+serve((request) => handle(request))
 const started = Date.now()
 
 function handle(request) {
+  // let t0 = Date.now()
   let routes = {
     "/favicon.ico": flag,
     "/new": random,
     "/save": save,
+    "/choices": choices,
     "/": solve
   }
   let client = request.headers.get("x-forwarded-for")
@@ -21,6 +25,8 @@ function handle(request) {
   } catch (err) {
     console.log(err)
     return new Response(`<pre>${err}</pre>`, {status:500})
+  // } finally {
+  //   console.log(Date.now()-t0, pathname)
   }
 }
 
@@ -61,14 +67,17 @@ async function save(search) {
   return new Response('ok', {status:200})
 }
 
-
+function choices(search) {
+  return new Response('bulk text to go here', {status:200})
+}
 
 function solve(search) {
 
   const blank = "................................................................................."
   const givensString = (search.replace('?','') + blank).substr(0, 81)
-  const givens = Array.from(givensString)
-  const choices = Array.from({length:81}).map(_=>"123456789")
+  let givens
+  let choices
+  let unique
 
   const subsets = [
 
@@ -106,6 +115,12 @@ function solve(search) {
     [72, 73, 74, 75, 76, 77, 78, 79, 80]
   ];
 
+  applyrules(givensString)
+
+function applyrules (givensString) {
+  givens = Array.from(givensString)
+  choices = Array.from({length:81}).map(_=>"123456789")
+
   // remove choices eliminated by the at-most-one rule
 
   for (let subset of subsets) {
@@ -120,7 +135,7 @@ function solve(search) {
 
   // identify choices mandated by the at-least-one rule
 
-  const unique = {};
+  unique = {};
   const digitCounts = Array.from("123456789")
     .reduce((acc, d) => {acc[d] = 0; return acc}, {});
   for (let subset of subsets) {
@@ -139,6 +154,7 @@ function solve(search) {
       .filter(d => counts[d] == 1)
       .forEach(d => unique[where[d]] = d)
   }
+}
 
   // display board as table of tables of hyperlinked choices
 
@@ -161,6 +177,20 @@ function solve(search) {
       choices[i].length==1 ? choices[i] :
       unique[i] ? unique[i] : '.')
     return res.join("")
+  }
+
+  function nextChoice() {
+    console.log('')
+    let res = givens.join("");
+    applyrules(res)
+    console.log(res,unique)
+    let nxt = nextForced();
+    while (nxt != res) {
+      res = nxt
+      applyrules(res)
+      console.log(res,unique)
+      nxt = nextForced()
+    }
   }
 
   function choicesFn(i) {
@@ -201,6 +231,7 @@ function solve(search) {
       </h1>
       ${board}
       <p><button onclick="location.href='/?${nextForced()}'">forced moves</button>
+      <button onclick="dochoices(event)">download choices</button>
       <p>We show choices satisfying two simple rules: <br>
       <i>at-most-one</i> and <i>at-least-one</i> of every digit<br>
       must appear in every row, column and square.</p>
@@ -210,10 +241,15 @@ function solve(search) {
           await fetch('./save'+location.search)
           event.target.disabled = true
         }
+        window.dochoices = async event => {
+          let json = await fetch('./choices'+location.search).then(res => res.text())
+          console.log(json)
+        }
       </script>
     </body>
     </html>`
 
+  // nextChoice()
   return new Response(text, { headers: { "content-type": "text/html" } })
 }
 
