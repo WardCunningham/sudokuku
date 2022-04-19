@@ -4,7 +4,6 @@
 import { Octokit, App } from "https://cdn.skypack.dev/octokit?dts";
 import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
 
-// addEventListener("fetch", event => event.respondWith(handle(event.request)))
 serve((request) => handle(request))
 const started = Date.now()
 
@@ -117,44 +116,44 @@ function solve(search) {
 
   applyrules(givensString)
 
-function applyrules (givensString) {
-  givens = Array.from(givensString)
-  choices = Array.from({length:81}).map(_=>"123456789")
+  function applyrules (givensString) {
+    givens = Array.from(givensString)
+    choices = Array.from({length:81}).map(_=>"123456789")
 
-  // remove choices eliminated by the at-most-one rule
+    // remove choices eliminated by the at-most-one rule
 
-  for (let subset of subsets) {
-    for (let i of subset) {
-      const d = givens[i];
-      if (d == ".") continue;
-      for (let j of subset) {
-        choices[j] = choices[j].replace(d, "");
+    for (let subset of subsets) {
+      for (let i of subset) {
+        const d = givens[i];
+        if (d == ".") continue;
+        for (let j of subset) {
+          choices[j] = choices[j].replace(d, "");
+        }
       }
     }
-  }
 
-  // identify choices mandated by the at-least-one rule
+    // identify choices mandated by the at-least-one rule
 
-  unique = {};
-  const digitCounts = Array.from("123456789")
-    .reduce((acc, d) => {acc[d] = 0; return acc}, {});
-  for (let subset of subsets) {
-    const counts = {...digitCounts};
-    const where = {...digitCounts};
-    subset
-      .filter(i => givens[i] == ".")
-      .forEach(i => {
-        const digits = Array.from(choices[i]);
-        for (let d of digits) {
-          counts[d] += 1;
-          where[d] = i;
-        };
-      });
-    Array.from("123456789")
-      .filter(d => counts[d] == 1)
-      .forEach(d => unique[where[d]] = d)
+    unique = {};
+    const digitCounts = Array.from("123456789")
+      .reduce((acc, d) => {acc[d] = 0; return acc}, {});
+    for (let subset of subsets) {
+      const counts = {...digitCounts};
+      const where = {...digitCounts};
+      subset
+        .filter(i => givens[i] == ".")
+        .forEach(i => {
+          const digits = Array.from(choices[i]);
+          for (let d of digits) {
+            counts[d] += 1;
+            where[d] = i;
+          };
+        });
+      Array.from("123456789")
+        .filter(d => counts[d] == 1)
+        .forEach(d => unique[where[d]] = d)
+    }
   }
-}
 
   // display board as table of tables of hyperlinked choices
 
