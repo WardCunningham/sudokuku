@@ -82,5 +82,10 @@ export function apply (query) {
       .forEach(d => unique[where[d]] = d)
   }
 
+  // no choice for givens or forced
+
+  givens.forEach((g,i) => {if(g!='.') choices[i]=''})
+  Object.entries(unique).forEach(([i,d]) => {choices[i]=d})
+
   return {givens,choices,unique}
 }

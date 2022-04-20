@@ -4,14 +4,23 @@
 
 import * as rules from './rules.js'
 
-const query = rules.trim(Deno.args[0])
-// const query = '.475..9....1....4...24...15.3........527.418........9.27...13...6....2....1..457.'
+let query = rules.trim(Deno.args[0])
+query = '.475..9....1....4...24...15.3........527.418........9.27...13...6....2....1..457.'
 
-console.error(query)
-console.error(rules.apply(query))
+console.error('search', query)
 
 let {givens,choices,unique} = rules.apply(query)
+console.error({givens,choices,unique})
+console.error('ones',todo(1))
+
+
+const t0 = Date.now()
 nextChoice()
+console.error('time',Date.now() - t0)
+
+console.error('ones',todo(1))
+console.error('twos',todo(2))
+
 
 function nextForced() {
   let res = givens.map((g,i) =>
@@ -33,4 +42,10 @@ function nextChoice() {
     console.error(res)
     nxt = nextForced()
   }
+}
+
+function todo(width) {
+  return givens
+    .map((digit,i) => (digit == '.' && choices[i].length == width) ? {i,choice:choices[i]} : null)
+    .filter(choice => choice != null)
 }
